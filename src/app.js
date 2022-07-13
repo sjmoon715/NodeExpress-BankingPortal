@@ -2,23 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 const express = require('express');
-const { ENGINE_METHOD_ALL } = require('constants');
-
 const app = express();
 
 const pathToViews = path.join(__dirname, '/views');
+const pathToStatic = path.join(__dirname, '/public');
 
 app.set('views', pathToViews);
 app.set('view engine', 'ejs');
 
-express.static('/public');
+app.use(express.static(pathToStatic));
 
-app.get('/', (req, res) => {
-    res.render('index', {title: 'Index'});
-});
+express.static()
 
-app.listen(3000, () => {
-    console.log('PS Project Running on port 3000!');
-});
+app.get('/', (req, res) => res.render('index', {title: 'Index'}));
 
-
+app.listen(3000, () => console.log('PS Project Running on port 3000!'));
