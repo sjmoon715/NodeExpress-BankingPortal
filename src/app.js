@@ -30,23 +30,23 @@ app.get('/profile', (req, res) => res.render('profile', {user: users[0]}));
 
 app.get('/transfer', (req, res) => res.render('transfer'));
 
+app.post('/transfer', (req, res) => {
+    accounts[req.body.from].balance -= req.body.amount;
+    accounts[req.body.to] += parseInt(req.body.amount, 10);
+
+    let accountsJSON = JSON.stringify(accounts, null, 4);
+    fs.writeFileSync(path.join(__dir, 'json', 'accounts.json'), accountsJSON, 'utf8');
+    res.render(transfer, {message : "Transfer Completed"});
+});
+
 app.get('/payment', (req, res) => res.render('payment', {account : accounts.credit}));
 
 app.post('/payment', () => {
-    accounts.credit.balance = parseInt(accounts.credit.balance) - parseInt(req.body.amount);
-    accounts.credit.available = parseInt(accounts.credit.available) + parseInt(req.body.amount);
-    const accountsJSON = JSON.stringify(accounts);
-    fs.writeFileSync('json/accounts.json', accountsJSON, {encoding:'utf8'});
+    accounts.credit.balance -= req.body.amount;
+    accounts.credit.available += parseInt(req.body.amount);
+    let accountsJSON = JSON.stringify(accounts, null, 4);
+    fs.writeFileSync(path.join(__dir, 'json', 'accounts.json'), accountsJSON, 'utf8');
     res.render('payment', { message : "payment succesful", account:accounts.credit});
-})
-
-app.post('/transfer', (req, res) => {
-    accounts[req.from] = accounts[req.from].balance - parseInt(req.amount);
-    accounts[req.to] = accounts[req.to].balance + parseInt(req.amount);
-
-    const accountsJSON = JSON.stringify(accounts);
-    fs.writeFileSync('json/accounts.json', accountsJSON);
-    res.render(transfer, {message : "Transfer Completed"});
 });
 
 app.listen(3000, () => { console.log('PS Project Running on port 3000!')});
