@@ -12,6 +12,8 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(pathToStatic));
 
+app.use(express.urlencoded({extended:true}));
+
 const accountData = fs.readFileSync(path.join(__dirname, 'json', 'accounts.json'), 'utf8');
 const accounts = JSON.parse(accountData);
 
@@ -25,5 +27,26 @@ app.get('/checking', (req, res) => res.render('account', {account : accounts.che
 app.get('/credit', (req, res) => res.render('account', {account : accounts.credit}));
 
 app.get('/profile', (req, res) => res.render('profile', {user: users[0]}));
+
+app.get('/transfer', (req, res) => res.render('transfer'));
+
+app.get('/payment', (req, res) => res.render('payment', {account : accounts.credit}));
+
+app.post('/payment', () => {
+    accounts.credit.balance = parseInt(accounts.credit.balance) - parseInt(req.body.amount);
+    accounts.credit.available = parseInt(accounts.credit.available) + parseInt(req.body.amount);
+    const accountsJSON = JSON.stringify(accounts);
+    fs.writeFileSync('json/accounts.json', accountsJSON, {encoding:'utf8'});
+    res.render('payment', { message : "payment succesful", account:accounts.credit});
+})
+
+app.post('/transfer', (req, res) => {
+    accounts[req.from] = accounts[req.from].balance - parseInt(req.amount);
+    accounts[req.to] = accounts[req.to].balance + parseInt(req.amount);
+
+    const accountsJSON = JSON.stringify(accounts);
+    fs.writeFileSync('json/accounts.json', accountsJSON);
+    res.render(transfer, {message : "Transfer Completed"});
+});
 
 app.listen(3000, () => { console.log('PS Project Running on port 3000!')});
