@@ -5,6 +5,16 @@
     <a href="/profile">Profile</a>
 </div><br>
 
+<div>
+    <%- include('summary', {account: accounts.savings}) %>
+</div><br>
+<div>
+    <%- include('summary', {account: accounts.checking}) %>
+</div><br>
+<div>
+    <%- include('summary', {account: accounts.credit}) %>
+</div><br>
+
 <a href="/transfer">Transfer</a>
 
 <%- include('footer'); %>
